@@ -1,0 +1,577 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"cluster",
+				"cluster_under_threshold"
+			],
+			[
+				"read",
+				"read_csv_file\tfunction"
+			],
+			[
+				"mime",
+				"mime-version"
+			],
+			[
+				"header",
+				"header_combination\tfunction"
+			],
+			[
+				"walk",
+				"walk_email_headers\tfunction"
+			],
+			[
+				"numer",
+				"numerical_heatmap\tstatement"
+			],
+			[
+				"stati",
+				"statistics\tfunction"
+			],
+			[
+				"set",
+				"set_threshold\tstatement"
+			],
+			[
+				"stat",
+				"statistics\tfunction"
+			],
+			[
+				"eml",
+				"emlgrp2"
+			],
+			[
+				"csv",
+				"csv_file\tstatement"
+			],
+			[
+				"matrix",
+				"matrix_list\tstatement"
+			],
+			[
+				"clipboard",
+				"clipboard_clear\tfunction"
+			],
+			[
+				"file",
+				"filename\tstatement"
+			],
+			[
+				"check",
+				"check_if_words_are_seen\tfunction"
+			],
+			[
+				"cooked",
+				"cooked_list"
+			],
+			[
+				"word_",
+				"word_input"
+			],
+			[
+				"word",
+				"word_list"
+			],
+			[
+				"c",
+				"character"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "# SSDeep TEST ON EMAILS\nimport re\nimport email_walk as walk\nimport os\n\n\ndef strip_urls_from_message(filename):\n    \"\"\"\n        Takes in a file, subs urls with nothing. Then writes this data to\n        a different file with 2 in front of the file name.\n    \"\"\"\n\n    message = walk.walk_email_body(filename)\n    #stripping links and links completely even TLD\n    #message = re.sub('<https?:\\/\\/.+>', '', message)  # removes links such as (https)\n    #message = re.sub('\\[https?:\\/\\/.+\\]', '', message) #removes links such as [https]\n\n    #stripping links partially up to TLD\n    # message = re.sub('\\[', '', message)\n    # message = re.sub('[^m:\\/\\/]\\/.+', '', message)\n    # message = os.linesep.join([s for s in message.splitlines() if s])\n\n    file = open('2' + filename, 'w')\n    file.write(message)\n    file.close()\n\n\ndef load_path_with_os():\n    \"\"\"Checks for the correct OS and changes the assets variable\n    to match for the correct operating system syntax\"\"\"\n\n    if os.name == 'mac' or 'linux':\n        assets = \"./assets\"\n    elif os.name == 'nt':\n        assets = \".\\\\assets\"\n\n    return os.chdir(assets)\n\n\ndef header_combination(filename):\n    \"\"\"\n        Takes in a file, combines the data from the headers\n        and concats them into one long string\n        arguments include headers['to,from,subject']\n        and a lot more must look at email module.\n        i.e: print 'to: ', headers['to']\n    \"\"\"\n\n    headers = walk.walk_email_headers(filename)\n    header2 = (headers['to'] + headers['from'] + headers['subject'] +\n               headers['mime-version'] + headers['message-id'])\n\n    file = open('2' + filename + '.txt', 'w')\n    file.write(header2)\n    file.close()\n\n\ndef run():\n    load_path_with_os()\n\n    # section to run strip url function with all files in assets directory\n    for filename in os.listdir(os.getcwd()):\n        strip_urls_from_message(filename)\n\n    # section to run to get the headers and combine them creating a new file\n    # for filename in os.listdir(os.getcwd()):\n    #     header_combination(filename)\n\n\n\nif __name__ == \"__main__\":\n    # all this to be put in run method later\n    run()\n",
+			"file": "deephashing.py",
+			"file_size": 2211,
+			"file_write_time": 131909492311919464,
+			"settings":
+			{
+				"buffer_size": 2138,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "import pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nimport networkx as nx\n\n# TODO:\n# create a way to generalize and strip out uneeded data and write this to another file\n# python cannot do the same things sed does but can simulate it. otherwise the option below will be used\n\n\nset_threshold = 30\n\n\ndef read_csv_to_dataframe():\n    # Reads CSV Fle and creates a dataframe with 3 columns\n    # graphical heatmap    18x182.txt for body match returns dataset in pandas and threshold\n    pd.set_option('max_colwidth', 800)\n\n    dataframe = pd.read_csv('18x18body.txt', usecols=[0, 1, 2],\n                            names=['emlgroup1', 'emlgroup2', 'scores'])\n    return dataframe\n\n\ndef get_heatmaps(dataframe):`\n    # creates numerical heatmap\n    numerical_heatmap = pd.pivot_table(dataframe, index='emlgroup1',\n                                       columns='emlgroup2', values='scores')\n    color_heatmap = sns.heatmap(numerical_heatmap)\n    print numerical_heatmap\n    return plt.show(color_heatmap)\n\n\ndef form_clusters(dataframe, set_threshold):\n    # creates a new dataframe where there are no duplicates\n    # and the data correlates to the threshold\n    cluster_threshold = dataframe.loc[(dataframe['emlgroup1'] !=\n                                      dataframe['emlgroup2']) &\n                                      (dataframe['scores'] > set_threshold)]\n\n    # generates clusters created from the dataframe cluster_under_threshold\n    G = nx.from_pandas_edgelist(cluster_threshold,\n                                'emlgroup1', 'emlgroup2')\n    series_of_clusters = list(nx.connected_components(G))\n    clusters = pd.Series(series_of_clusters).to_frame('Clusters')\n    return clusters\n\n\nif __name__ == \"__main__\":\n    print form_clusters(read_csv_to_dataframe(), set_threshold)\n    #get_heatmaps(read_csv_to_dataframe())\n",
+			"file": "automate matrice/matrix_and_thresholds.py",
+			"file_size": 2670,
+			"file_write_time": 131913066411320912,
+			"settings":
+			{
+				"buffer_size": 1848,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "auto_test/auto.py",
+			"settings":
+			{
+				"buffer_size": 245,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 79.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"set syntax pyt",
+				"Set Syntax: Python"
+			],
+			[
+				"set syntax py",
+				"Set Syntax: Python"
+			],
+			[
+				"set sy ntax",
+				"Set Syntax: YAML"
+			],
+			[
+				"set syn",
+				"Set Syntax: Python"
+			],
+			[
+				"set syntax",
+				"Set Syntax: Python"
+			],
+			[
+				"package insta",
+				"Package Control: Install Package"
+			],
+			[
+				"remove package",
+				"Package Control: Remove Package"
+			],
+			[
+				"package remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"set syntax Java",
+				"Set Syntax: Java"
+			],
+			[
+				"set syntax java",
+				"Set Syntax: Java"
+			],
+			[
+				"set",
+				"Set Syntax: Python"
+			],
+			[
+				"s",
+				"Set Syntax: Python"
+			],
+			[
+				"set syntax html",
+				"Set Syntax: HTML"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			],
+			[
+				"package ",
+				"Install Package Control"
+			]
+		],
+		"width": 462.0
+	},
+	"console":
+	{
+		"height": 154.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/F/Users/Desktop/hashResearch"
+	],
+	"file_history":
+	[
+		"/F/Users/Desktop/hashResearch/email_walk.py",
+		"/F/Users/Desktop/hashResearch/automate matrice/p1.py",
+		"/F/Users/Desktop/stoneblock/server.properties",
+		"/F/Users/Desktop/stoneblock/LaunchServer.sh",
+		"/F/Users/Desktop/stoneblock/settings.sh",
+		"/F/Osu/osu!.Steven.cfg",
+		"/F/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg/autoexec.cfg",
+		"/F/Users/Desktop/bad_eml.txt",
+		"/F/Users/Desktop/rice/rice.py",
+		"/F/Users/Desktop/hashResearch/automate matrice/matrix_and_thresholds.py",
+		"/F/Users/Desktop/rice/start_rice.sh",
+		"/F/Users/Desktop/hashResearch/asset testcases/original corpus/1736.eml",
+		"/F/Users/Desktop/hashResearch/assets/headert/testcase.txt",
+		"/F/Users/Desktop/hashResearch/assets/-1739.eml",
+		"/F/Users/Desktop/wordaug/word.py",
+		"/F/Users/Desktop/hashResearch/automate matrice/t4.txt",
+		"/F/Users/Desktop/hashResearch/automate matrice/t3.txt",
+		"/F/Users/Desktop/hashResearch/automate matrice/t2.txt",
+		"/F/Users/Desktop/hashResearch/matrix_and_thresholds.py",
+		"/F/Users/Desktop/18x18 matrix/commands_help.txt",
+		"/F/Users/Desktop/t3.txt",
+		"/F/Users/Desktop/t4.txt",
+		"/F/Users/Desktop/t2.txt",
+		"/F/Users/Desktop/word_agg.py",
+		"/F/Users/Desktop/outputs.txt",
+		"/F/Users/Desktop/18x18.txt",
+		"/F/Users/Desktop/Calculate Test/CalculateTest.java",
+		"/F/Users/Desktop/Calculate Test/Calculate.java",
+		"/F/Users/Desktop/Calculate.java",
+		"/F/Users/Desktop/CalculateTest.java",
+		"/F/Users/Desktop/Forman_Final/java_final_forman/Java_Final/StevensFinalEscape.java",
+		"/F/Users/Desktop/Forman_Final/java_final_openGL/java_final.java",
+		"/F/Users/Desktop/Forman_Final/lwjgl 3 stable/build.txt",
+		"/F/Google Drive Backup/nag/nagiosremove.py",
+		"/D/Nano Wallet.txt",
+		"/F/Users/Desktop/Crypto/gatehub_recovery_key.txt",
+		"/F/Users/Desktop/Edgewave/Edgewave Spam Assesment Steven Ly.txt",
+		"/F/Users/Desktop/nag/nagiosremove.py",
+		"/F/Users/Desktop/nag/systems.txt",
+		"/F/Users/Desktop/nag/outboundgroup.cfg",
+		"/F/Users/Desktop/nag/criticalgroup.cfg",
+		"/F/Users/Desktop/nag/rci_hostgroups.cfg",
+		"/F/Users/Desktop/nag/text_test.py",
+		"/F/Users/Desktop/nag - Copy/rci_hostgroups.cfg",
+		"/F/Users/Desktop/nag - Copy/criticalgroup.cfg",
+		"/F/Users/Desktop/nag - Copy/systems.txt",
+		"/F/Users/Desktop/nag/nagiosremove.sh",
+		"/F/Google Drive Backup/Enviroments/ENV/Scripts/test_file.py",
+		"/F/Google Drive Backup/Enviroments/ENV/Scripts/test_run_token.py",
+		"/F/Google Drive Backup/Enviroments/ENV/Scripts/word_arg.py",
+		"/F/Users/Downloads/test_run_token.py",
+		"/F/Users/Desktop/settings",
+		"/F/Users/Desktop/timepicker.js",
+		"/F/Google Drive Backup/Sublime Text 3/Python/shelltest.py",
+		"/F/Google Drive Backup/Sublime Text 3/website.html",
+		"/F/Google Drive Backup/Sublime Text 3/New folder/shelltest.py",
+		"/F/Google Drive Backup/Sublime Text 3/Python/pc_desktop.py"
+	],
+	"find":
+	{
+		"height": 27.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"/home/obohp/Desktop/hashcomp/hashvisuals/bad_eml/",
+			"\"/home/obohp/Desktop/hashcomp/hashvisuals/bad_eml/",
+			"txt100",
+			"\""
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "deephashing.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2138,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								740,
+								740
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"auto_name": "",
+							"git_gutter_is_enabled": false,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "automate matrice/matrix_and_thresholds.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1848,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								729,
+								729
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"git_gutter_is_enabled": false,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "auto_test/auto.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 245,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								245,
+								245
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 43.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 29.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/Python/Python.sublime-build",
+	"project": "s3project.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
